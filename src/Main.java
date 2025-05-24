@@ -15,7 +15,7 @@ public class Main extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        primaryStage.setTitle("Настройка приёмной спутниковой антенны по азимуту (АЗ) и углу места (УМ) на выбранный космический аппарат (КА)");
+        primaryStage.setTitle("Поиск частоты и символьной скорости с привязкой к спутнику");
         primaryStage.setScene(new Scene(root, 860, 650));
 // Чтобы нельзя было изменять размеры окна
         primaryStage.setResizable(false);

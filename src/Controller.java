@@ -21,19 +21,16 @@ import java.util.Properties;
 public class Controller extends Component  {
 
     @FXML
-    private Button button1, button2, button3, button4, button5, button7;
+    private Button button1, button2, button3, button5, button7;
 
     @FXML
     private TableView<ObservableList> TableView1;
 
     @FXML
-    private Label label1, label2, label3, label4, label16;
+    private Label label1, label2, label16;
 
     @FXML
-    private TextField textField1, textField6, textField9;
-
-    @FXML
-    private RadioButton radio1, radio2;
+    private TextField textField1, textField2, textField9;
 
     private ObservableList<ObservableList> data;
 
@@ -42,7 +39,7 @@ public class Controller extends Component  {
     private String nameKA;
     private String freq;
     private String pol;
-    private String azreal;
+    private String symbol_rate;
     private String umreal;
     private String comment;
     private double pt;
@@ -96,47 +93,14 @@ public class Controller extends Component  {
 
 // Установить их в textField
         textField1.setText(String.valueOf(nameKA));
-        textField6.setText(String.valueOf(pt));
         pathToDatabase = theDir1.getPath();
         CON_STR = "jdbc:sqlite:" + pathToDatabase;
 
 // активные поля в зависимости от радиокнопки
         textField1.setEditable(true);
         textField1.setDisable(false);
-        textField6.setEditable(false);
-        textField6.setDisable(true);
 
-        if(textField1.getText().length() == 0 || textField6.getText().length() == 0){
-            // Поле пустое
-            System.out.println("Поле Имя КА или ПТ пустое");
-        }else {
-            // Поле заполнено
-            if(radio1.isSelected()){
-                // Если выбрана кнопка 1
-                nameKA = textField1.getText().trim();
-                SQL = "SELECT * FROM satellite WHERE SATELLITE_NAME like '%" + nameKA + "%'";
-                TableView1.getItems().clear();
-                TableView1.getColumns().clear();
-                TableView1.refresh();
-                label1.setText("SQL = " + SQL);
-                label2.setTextFill(Color.web("#FF0000"));
-                label2.setText("Выберите КА из Таблицы");
-//                sql();
-            }else{
-                // Если выбрана кнопка 2
-                pt = Double.parseDouble(textField6.getText().trim());
-                SQL = "SELECT * FROM satellite WHERE PT = " + pt + " ";
-                TableView1.getItems().clear();
-                TableView1.getColumns().clear();
-                TableView1.refresh();
-                label1.setText("SQL = " + SQL);
-                label2.setTextFill(Color.web("#FF0000"));
-                label2.setText("Выберите КА из Таблицы");
-                sql();
-            }
-        }
-
-//Нажатие на кнопку 1 - Вывести все данные из БД в таблицу - начало
+//Нажатие на кнопку 1 - Вывести все частоты из БД в таблицу - начало
         button1.setOnAction(event -> {
             data = FXCollections.observableArrayList();
             TableView1.getItems().clear();
@@ -146,9 +110,6 @@ public class Controller extends Component  {
             System.out.println("SQL = " + SQL);
             label1.setText("SQL = " + SQL);
             textField1.setText("");
-            label2.setTextFill(Color.web("#FF0000"));
-            label2.setText("Выберите КА из Таблицы");
-            textField6.setText("");
             sql();
 //            select();
         });
@@ -162,12 +123,7 @@ public class Controller extends Component  {
             TableView1.refresh();
             textField1.setText("");
             textField9.setText("");
-            label2.setTextFill(Color.web("#000000"));
-            label2.setText("Введите имя КА или ПТ для расчёта");
             label1.setText("");
-            textField6.setText("");
-            label4.setTextFill(Color.web("#000000"));
-            label4.setText("Введите координаты вашей антенны");
         });
 //Нажатие на кнопку 2 - Очистить таблицу - конец
 
@@ -175,58 +131,22 @@ public class Controller extends Component  {
 //Нажатие на кнопку 3 - Занести частоту, поляризацию и подспутниковую точку в Базу данных - начало
         button3.setOnAction(event -> {
 // Проверка за заполненность полей Имя КА, частота, поляризация
-                    if (textField1.getText().length() == 0 || textField6.getText().length() == 0) {
-                        label2.setTextFill(Color.web("#FF0000"));
-                        label2.setText("Введите имя КА или ПТ для расчёта");
+                    if (textField1.getText().length() == 0) {
 
                     }else if (textField9.getText().length() == 0){
                         label16.setTextFill(Color.web("#FF0000"));
                         label16.setText("COMMENT *");
-
                     }else {
-                        label2.setTextFill(Color.web("#000000"));
-                        label2.setText("Введите имя КА или ПТ для расчёта");
                         label16.setTextFill(Color.web("#000000"));
                         label16.setText("COMMENT *");
                         nameKA = textField1.getText().trim().replace(",", ".");
                         comment = textField9.getText().trim().replace(",", ".");
-                        pt = Double.parseDouble(textField6.getText().trim().replace(",", "."));
-                        SQL = "UPDATE satellite SET FREQ = " + freq + ", POL = '" + pol + "'" +   ", PT = '" + pt + "'" + ", AZ_REAL = '" + azreal + "'" + ", UM_REAL = '" + umreal + "'" + ", COMMENT = '" + comment + "'" + " WHERE SATELLITE_NAME = '" + nameKA + "'"; // OK
+                        SQL = "UPDATE satellite SET FREQ = " + freq + ", PT = '" + pt + "'" + ", SYMBOL_RATE = '" + symbol_rate + "'" + ", COMMENT = '" + comment + "'" + " WHERE FREQ = '" + freq + "'"; // OK
                         sql2();
                         label1.setText("SQL = " + SQL);
                     }
         });
 //Нажатие на кнопку 3 - Занести частоту, поляризацию и подспутниковую точку в Базу данных - конец
-
-//Нажатие на кнопку 4 - рассчитать Азимут и Угол места - начало
-        button4.setOnAction(event -> {
-
-            if(radio1.isSelected()){
-                // Если выбрана кнопка 1
-                nameKA = textField1.getText().trim();
-                SQL = "SELECT * FROM satellite WHERE SATELLITE_NAME like '%" + nameKA + "%'";
-                TableView1.getItems().clear();
-                TableView1.getColumns().clear();
-                TableView1.refresh();
-                label1.setText("SQL = " + SQL);
-                label2.setTextFill(Color.web("#FF0000"));
-                label2.setText("Выберите КА из Таблицы");
-                sql();
-            }else{
-                // Если выбрана кнопка 2
-                pt = Double.parseDouble(textField6.getText().trim());
-                SQL = "SELECT * FROM satellite WHERE PT = " + pt + " ";
-                TableView1.getItems().clear();
-                TableView1.getColumns().clear();
-                TableView1.refresh();
-                label1.setText("SQL = " + SQL);
-                label2.setTextFill(Color.web("#FF0000"));
-                label2.setText("Выберите КА из Таблицы");
-                sql();
-            }
-        });
-//Нажатие на кнопку 4 - рассчитать Азимут и Угол места - конец
-
 
 //Нажатие на кнопку 5 - Описание программы - начало
         button5.setOnAction(event -> {
@@ -238,52 +158,19 @@ public class Controller extends Component  {
 //Нажатие на кнопку 7 - Найти - начало
         button7.setOnAction(event -> {
 
-            if(radio1.isSelected()){
-                // Если выбрана кнопка 1
-                nameKA = textField1.getText().trim();
-                SQL = "SELECT * FROM satellite WHERE SATELLITE_NAME like '%" + nameKA + "%'";
-                TableView1.getItems().clear();
-                TableView1.getColumns().clear();
-                TableView1.refresh();
-                label1.setText("SQL = " + SQL);
-                label2.setTextFill(Color.web("#FF0000"));
-                label2.setText("Выберите КА из Таблицы");
-                sql();
-            }else{
-                // Если выбрана кнопка 2
-                pt = Double.parseDouble(textField6.getText().trim());
-                SQL = "SELECT * FROM satellite WHERE PT = " + pt + " ";
-                TableView1.getItems().clear();
-                TableView1.getColumns().clear();
-                TableView1.refresh();
-                label1.setText("SQL = " + SQL);
-                label2.setTextFill(Color.web("#FF0000"));
-                label2.setText("Выберите КА из Таблицы");
-                sql();
-            }
+            nameKA = textField1.getText().trim();
+            SQL = "SELECT * FROM satellite WHERE FREQ like '%" + nameKA + "%'";
+            TableView1.getItems().clear();
+            TableView1.getColumns().clear();
+            TableView1.refresh();
+            label1.setText("SQL = " + SQL);
+            sql();
+
         });
 //Нажатие на кнопку  7 - Найти - конец
 
 // Этот метод нужен если не была нажата кнопка "Вывести все данные из Базы данных в таблицу" а сразу введен КА и нажата кнопка "Найти и рассчитать АЗ и УМ"
         select();
-    }
-
-// Радиокнопка выбора режима ввода частоты - 5
-    public void onRadio1(javafx.event.ActionEvent actionEvent) {
-        System.out.println("onRadio1");
-        textField1.setEditable(true);
-        textField1.setDisable(false);
-        textField6.setEditable(false);
-        textField6.setDisable(true);
-    }
-
-// Радиокнопка выбора режима ввода частоты - 6
-    public void onRadio2(javafx.event.ActionEvent actionEvent) {
-        System.out.println("onRadio2");
-        textField1.setEditable(false);
-        textField1.setDisable(true);
-        textField6.setEditable(true);
-        textField6.setDisable(false);
     }
 
 // Метод сохранения в properties
@@ -297,7 +184,6 @@ public class Controller extends Component  {
             e.printStackTrace();
         }
         nameKA = textField1.getText();
-        pt = Double.parseDouble(textField6.getText());
 
         appProps.setProperty("nameKA", String.valueOf(nameKA));
         appProps.setProperty("pt", String.valueOf(pt));
@@ -339,13 +225,10 @@ public class Controller extends Component  {
                         String[] words = text.split(",");
 // Выберем только нужные значения, т.е. столбцы и выведем их в textField1 в зависимости от того какая была нажата кнопка и соответсвенно было значение переменной valueSelect
                         for (int i = 0; i < words.length; i++) {
-                            //System.out.println(words[i]);
-                            label2.setTextFill(Color.web("#000000"));
-                            label2.setText("Выберите КА из Таблицы");
+                            System.out.println("i = " +i + " words[i = ]" + words[i]);
                             pt = Double.parseDouble(words[1].trim());
-                            textField6.setText(words[1].trim()); // PT
-                            textField1.setText(words[2].trim()); // Имя КА
-                            textField9.setText(words[7].replace(']', ' ').trim()); // Комментарий
+                            textField1.setText(words[2].trim()); // FREQ
+                            textField9.setText(words[4].replace(']', ' ').trim()); // Комментарий
                             saveToPropertiesSetting();
                     }
 
@@ -412,11 +295,9 @@ public class Controller extends Component  {
 
 //условие: пока не введены часта и поляризация расчет не будет производиться
         if (textField1.getText().length() == 0 ) {
-            label2.setTextFill(Color.web("#FF0000"));
-            label2.setText("Введите имя КА или ПТ для расчёта");
+
         } else {
-            label2.setTextFill(Color.web("#000000"));
-            label2.setText("Введите имя КА или ПТ для расчёта");
+
             data = FXCollections.observableArrayList();
             try {
                 DriverManager.registerDriver(new JDBC());
