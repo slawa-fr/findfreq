@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane id="radio5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="860.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+   <children>
+      <Button id="button1" fx:id="button1" layoutX="14.0" layoutY="121.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="248.0" text="Вывести все КА из БД в таблицу" />
+      <Button id="button2" fx:id="button2" layoutX="724.0" layoutY="610.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="123.0" text="Очистить таблицу" />
+      <TableView id="TableView1" fx:id="TableView1" layoutX="285.0" layoutY="51.0" prefHeight="547.0" prefWidth="562.0">
+
+      </TableView>
+      <Label id="label1" fx:id="label1" alignment="CENTER" contentDisplay="CENTER" layoutX="9.0" layoutY="7.0" prefHeight="31.0" prefWidth="838.0" textAlignment="CENTER" />
+      <Label id="label2" fx:id="label2" alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="146.0" prefHeight="31.0" prefWidth="248.0" text="Введите имя КА или ПТ для расчёта" textAlignment="CENTER" />
+      <TextField id="textField1" fx:id="textField1" layoutX="14.0" layoutY="179.0" prefHeight="31.0" prefWidth="138.0" />
+      <Button id="button3" fx:id="button3" layoutX="15.0" layoutY="610.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="248.0" text="Сохранить в БД поля отмеченные  *" />
+      <Button id="button5" fx:id="button5" layoutX="533.0" layoutY="610.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="180.0" text="Описание программы" />
+      <Label id="label3" fx:id="label3" layoutX="162.0" layoutY="179.0" prefHeight="31.0" prefWidth="30.0" text="ПТ: *" />
+      <Button id="button4" fx:id="button4" layoutX="15.0" layoutY="254.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="248.0" text="Рассчитать АЗ и УМ" />
+      <Label id="label4" fx:id="label4" alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="56.0" prefHeight="31.0" prefWidth="248.0" text="Введите координаты вашей антенны" textAlignment="CENTER" />
+      <Separator layoutX="15.0" layoutY="382.0" prefHeight="0.0" prefWidth="248.0" />
+      <TextField id="textField6" fx:id="textField6" layoutX="197.0" layoutY="179.0" prefHeight="31.0" prefWidth="48.0" />
+      <Label id="label11" fx:id="label11" layoutX="253.0" layoutY="179.0" prefHeight="31.0" prefWidth="23.0" text="°" />
+      <RadioButton id="radio1" fx:id="radio1" layoutX="93.0" layoutY="223.0" mnemonicParsing="false" onAction="#onRadio1" selected="true" text="по имени КА">
+         <toggleGroup>
+            <ToggleGroup fx:id="group1" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton id="radio2" fx:id="radio2" layoutX="211.0" layoutY="223.0" mnemonicParsing="false" onAction="#onRadio2" prefHeight="17.0" prefWidth="68.0" text="по ПТ" toggleGroup="$group1" />
+      <Label id="label16" fx:id="label16" alignment="CENTER" contentDisplay="CENTER" layoutX="15.0" layoutY="540.0" prefHeight="31.0" prefWidth="248.0" text="COMMENT *" textAlignment="CENTER" />
+      <TextField id="textField9" fx:id="textField9" layoutX="15.0" layoutY="571.0" prefHeight="31.0" prefWidth="248.0" />
+      <Button id="button7" fx:id="button7" layoutX="15.0" layoutY="219.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" text="Найти" />
+
+   </children>
+</AnchorPane>
