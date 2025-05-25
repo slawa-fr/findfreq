@@ -18,6 +18,8 @@ import java.net.URL;
 import java.sql.*;
 import java.util.Properties;
 
+// Программа создана 25.05.2025 на основе программы antennasetup
+
 public class Controller extends Component  {
 
     @FXML
