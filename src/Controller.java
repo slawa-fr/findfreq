@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.sqlite.JDBC;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
