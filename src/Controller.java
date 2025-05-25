@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.sqlite.JDBC;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
@@ -36,11 +37,9 @@ public class Controller extends Component  {
 
     public String SQL = "SELECT * FROM satellite";
 
-    private String nameKA;
     private String freq;
-    private String pol;
+    private String gisterezis = "0";
     private String symbol_rate;
-    private String umreal;
     private String comment;
     private double pt;
 
@@ -87,12 +86,14 @@ public class Controller extends Component  {
             e.printStackTrace();
         }
 
-// Получить значения nameKA, ПТ, широты - lat и долготы - lon из database/setting.properties"
-        nameKA = appProps.getProperty("nameKA", "Express AM7");
-        pt = Double.parseDouble(appProps.getProperty("pt", "40.0"));
+// Получить значения freq, ПТ из database/setting.properties"
+        freq = appProps.getProperty("freq", "11469");
+        gisterezis = appProps.getProperty("gisterezis", "0");
+        pt = Double.parseDouble(appProps.getProperty("pt", "46.0"));
 
 // Установить их в textField
-        textField1.setText(String.valueOf(nameKA));
+        textField1.setText(String.valueOf(freq));
+        textField2.setText(String.valueOf(gisterezis));
         pathToDatabase = theDir1.getPath();
         CON_STR = "jdbc:sqlite:" + pathToDatabase;
 
@@ -122,6 +123,7 @@ public class Controller extends Component  {
             TableView1.getColumns().clear();
             TableView1.refresh();
             textField1.setText("");
+            textField2.setText("0");
             textField9.setText("");
             label1.setText("");
         });
@@ -139,9 +141,10 @@ public class Controller extends Component  {
                     }else {
                         label16.setTextFill(Color.web("#000000"));
                         label16.setText("COMMENT *");
-                        nameKA = textField1.getText().trim().replace(",", ".");
+                        freq = textField1.getText().trim().replace(",", ".");
                         comment = textField9.getText().trim().replace(",", ".");
                         SQL = "UPDATE satellite SET FREQ = " + freq + ", PT = '" + pt + "'" + ", SYMBOL_RATE = '" + symbol_rate + "'" + ", COMMENT = '" + comment + "'" + " WHERE FREQ = '" + freq + "'"; // OK
+                        System.out.println("SQL = " + SQL);
                         sql2();
                         label1.setText("SQL = " + SQL);
                     }
@@ -151,15 +154,47 @@ public class Controller extends Component  {
 //Нажатие на кнопку 5 - Описание программы - начало
         button5.setOnAction(event -> {
 // Справка по программе через поток - Potok1
-            //Potok1.main();
+            Potok1.main();
         });
 //Нажатие на кнопку 5 - Описание программы  - конец
 
 //Нажатие на кнопку 7 - Найти - начало
         button7.setOnAction(event -> {
 
-            nameKA = textField1.getText().trim();
-            SQL = "SELECT * FROM satellite WHERE FREQ like '%" + nameKA + "%'";
+            freq = textField1.getText().trim();
+            gisterezis = textField2.getText().trim();
+            //System.out.println("gisterezis = " + gisterezis);
+
+                    if(freq == null || freq.isEmpty()){
+                        freq = "11469";
+                        label2.setTextFill(Color.web("#FF0000"));
+                        label2.setText("Введите искомую частоту");
+                    }else {
+                        //freq = "11469";
+                        label2.setTextFill(Color.web("#000000"));
+                        label2.setText("Введите искомую частоту");
+                    }
+
+                    if(gisterezis == null || gisterezis.isEmpty()){
+                        //System.out.println("gisterezis1 = " + gisterezis);
+                        gisterezis = "0";
+                        int freqTemp1 = Integer.parseInt(freq) - Integer.parseInt(gisterezis);
+                        int freqTemp2 = Integer.parseInt(freq) + Integer.parseInt(gisterezis);
+                        //System.out.println("freqTemp1 = " + freqTemp1 + " freqTemp2 = " + freqTemp2);
+                        SQL = "SELECT * FROM satellite WHERE FREQ BETWEEN " + freqTemp1 + " AND " + freqTemp2 + "";
+                        //System.out.println("SQL2 = " + SQL);
+
+                    }else {
+                        //System.out.println("gisterezis2 = " + gisterezis);
+                        gisterezis = textField2.getText().trim();
+                        int freqTemp1 = Integer.parseInt(freq) - Integer.parseInt(gisterezis);
+                        int freqTemp2 = Integer.parseInt(freq) + Integer.parseInt(gisterezis);
+                        //System.out.println("freqTemp1 = " + freqTemp1 + " freqTemp2 = " + freqTemp2);
+                        SQL = "SELECT * FROM satellite WHERE FREQ BETWEEN " + freqTemp1 + " AND " + freqTemp2 + "";
+                        //SQL = "SELECT * FROM satellite WHERE FREQ like '%" + freq + "%'"; // OK исходная рабочая строка
+                        System.out.println("SQL2 = " + SQL);
+                    }
+
             TableView1.getItems().clear();
             TableView1.getColumns().clear();
             TableView1.refresh();
@@ -183,10 +218,12 @@ public class Controller extends Component  {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        nameKA = textField1.getText();
+        freq = textField1.getText();
+        gisterezis = textField2.getText();
 
-        appProps.setProperty("nameKA", String.valueOf(nameKA));
+        appProps.setProperty("freq", String.valueOf(freq));
         appProps.setProperty("pt", String.valueOf(pt));
+        appProps.setProperty("gisterezis", String.valueOf(gisterezis));
 
 // Сохраним в setting.properties внесенные изменения из текстовых полей
         String newAppProps = "database/setting.properties";
@@ -229,6 +266,7 @@ public class Controller extends Component  {
                             pt = Double.parseDouble(words[1].trim());
                             textField1.setText(words[2].trim()); // FREQ
                             textField9.setText(words[4].replace(']', ' ').trim()); // Комментарий
+                            symbol_rate = words[3].replace(']', ' ').trim();
                             saveToPropertiesSetting();
                     }
 
@@ -255,14 +293,14 @@ public class Controller extends Component  {
 // Statement используется для того, чтобы выполнить sql-запрос
         try (Statement statement = this.connection.createStatement()) {
             ResultSet rs = statement.executeQuery(SQL);
-            //System.out.println("rs = " + rs);
+            //System.out.println("SQL = " + SQL);
 // Пример заполнения TableView из БД
 // https://github.com/seifallah/Dynamic-TableView--Java-Fx-2.0-/blob/master/DynamicTable.java
             for(int i=0 ; i<rs.getMetaData().getColumnCount(); i++){
                 //We are using non property style for making dynamic table
                 final int j = i;
                 TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i+1));
-                //System.out.println("col = " + col);
+                System.out.println("col = " + col);
                 col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){
                     public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
                         return new SimpleStringProperty(param.getValue().get(j).toString());
@@ -517,6 +555,58 @@ public class Controller extends Component  {
         }
     }
 }
+
+
+// Всплывающее окно
+// https://fooobar.com/questions/102466/popup-message-boxes
+class ClassNameHere {
+    public static void infoBox(String infoMessage, String titleBar) {
+        JOptionPane.showMessageDialog(null, infoMessage, " Описание программы " + titleBar, JOptionPane.INFORMATION_MESSAGE);
+    }
+}
+
+// Всплывающее окно со справкой по программе запускаем в другом потоке чтобы UI интерфейс не стопорился
+// Работа с потоками
+// https://www.youtube.com/watch?v=Jr6L2f5BACM&list=PL0lO_mIqDDFUzG5WOCUVmqx4CBW2qIulV&index=5
+// 1 Создаем класс SomePotok1, который унаследуется от класса Thread
+class SomePotok1 extends Thread{
+    // 2 Создаем метод run, который позволяет создавать потоки
+    public void run(){
+// Код, который будет выполняться в другом потоке
+        try {
+            //new PrimerFiles().main();
+// Всплывающее окно - справка по программе
+            ClassNameHere.infoBox("Программа предназначена для поиска частоты и символьной скорости с привязкой к спутнику.\n\n" +
+                    "В программе используется база данных (БД) SQLite, которая хранится в файле database_sat.db.\n" +
+                    "Этот файл был создан на основе файла satellite.csv в программе \"DB Browser (SQLite)\".\n" +
+                    "Файл satellite.csv был создан из satellite.xlsx путем сохранения его в: CSV (Разделители - запятые).\n" +
+                    " Очень важно, чтобы в данных в качестве разделителя целой части от дробной в числовых значениях\n" +
+                    " была обязательно точка, а не запятая и все поля таблицы были: формат ячеек - текстовый.\n" +
+                    " При первом запуске программы эти файлы будут созданы автоматически в папке database в том месте, где была запущена эта программа.\n\n" +
+                    " Работа с программой интуитивно понятна:\n" +
+                    " 1. При нажатии на кнопку \"Вывести все частоты из БД в таблицу\" - выводятся все данные хранящиеся в БД.\n" +
+                    " 2. При выборе из таблицы нужной частоты, значение частоты отобразится в поле \"Введите искомую частоту\".\n" +
+                    " 3. Можно изменить частоту на нужную - назовём её искомую. А также задать диапазон, назовём его - гистерезис.\n" +
+                    " 4. Далее нужно нажать на кнопку \"Найти\" и просмотреть полученный результат.\n" +
+
+
+                    "Удачи!", " ");
+            //System.out.println(" Запущен ClassNameHere.infoBox через поток1 - SomePotok1");
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+}
+
+class Potok1 {
+    public static void main() {
+// 3 Создаем объект на основе класса SomePotok1
+        SomePotok1 potok1 = new SomePotok1();
+// 4 Вызываем метод run - обязательно  через метод start()
+        potok1.start();
+    }
+}
+
 
 
 
